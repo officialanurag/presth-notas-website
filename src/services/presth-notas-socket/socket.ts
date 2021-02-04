@@ -11,7 +11,7 @@ import { GLOBAL_APP_STATUS } from '../../global';
 class PresthNotasSocket {
     private static instance: PresthNotasSocket;
 
-    private connString: string = 'ws://pickiser.com:4000';
+    private connString: string = 'wss://pickiser.com:4000';
     private connection: WebSocket = {} as any;
     private status = {
         isConnected: false
