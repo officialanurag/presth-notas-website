@@ -57,6 +57,7 @@ class PresthNotasSocket {
                 this.restartConnection();
             }
         } catch(error) {
+            console.log(error)
             console.log("Error")
         }
     }
