@@ -11,7 +11,7 @@ import { GLOBAL_APP_STATUS } from '../../global';
 class PresthNotasSocket {
     private static instance: PresthNotasSocket;
 
-    private connString: string = 'wss://pickiser.com/sock';
+    private connString: string = 'wss://pickiser.com:4000';
     private connection: WebSocket = {} as any;
     private status = {
         isConnected: false
@@ -32,7 +32,7 @@ class PresthNotasSocket {
 
     private initProcess () {
         try {
-            this.connection = new WebSocket(this.connString, 'echo-protocol');
+            this.connection = new WebSocket(this.connString);
 
             this.connection.onopen = (e) => {        
                 console.log('%c Connection Established Successfully.', 'color: green');
