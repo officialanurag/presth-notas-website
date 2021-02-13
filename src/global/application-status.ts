@@ -7,6 +7,7 @@ class ApplicationStatus {
      * Global properties to be used in application
      * Declare all properties here.
      */
+    private enableProject: boolean = false;
     private isDatosServerConnected: boolean = false;
     private updateNetworkStatusBar: Function = function() {};
     private subscribedNetworkLiveUpdateRegister: {[key: string]: Function} = {};
@@ -23,23 +24,32 @@ class ApplicationStatus {
     private constructor() {}
 
     private notifySubscribers(status: boolean): void {
-        if (status) {
-            Object.values(this.subscribedNetworkLiveUpdateRegister).forEach(_subscriber => _subscriber());
-        } else {
-            Object.values(this.subscribedNetworkNotLiveUpdateRegister).forEach(_subscriber => _subscriber());
+        if (this.enableProject) {
+            if (status) {
+                Object.values(this.subscribedNetworkLiveUpdateRegister).forEach(_subscriber => _subscriber());
+            } else {
+                Object.values(this.subscribedNetworkNotLiveUpdateRegister).forEach(_subscriber => _subscriber());
+            }
         }
     }
 
     public setServerStatus(status: boolean): void {
         this.isDatosServerConnected = status;
-        this.updateNetworkStatusBar(status)
-        this.notifySubscribers(status);
+        if (this.enableProject) {
+            this.updateNetworkStatusBar(status)
+            this.notifySubscribers(status);
+        }
     }
 
     public getServerStatus(): GlobalStatus {
         return {
-            isDatosServerConnected: this.isDatosServerConnected
+            isDatosServerConnected: this.enableProject ? this.isDatosServerConnected : this.enableProject,
+            isEnbaleProject: this.enableProject
         };
+    }
+
+    public setApplicationReadyStatus(status: boolean): void {
+        this.enableProject = status;
     }
 
     public setNetworkUpdateCallback(callback: Function) {

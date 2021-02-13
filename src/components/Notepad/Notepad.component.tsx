@@ -81,14 +81,11 @@ function Notepad() {
         /**
          * Loads content
          */
-        const loadContent = () => {
-            if (GLOBAL_APP_STATUS.getServerStatus().isDatosServerConnected && storeMode !== 'indexeddb') {
-                Content.fetchContent('user_123');
-            }
+        if (GLOBAL_APP_STATUS.getServerStatus().isDatosServerConnected && storeMode !== 'indexeddb') {
+            Content.fetchContent('user_123');
         }
 
         Content.subscribe(onResponse);
-        GLOBAL_APP_STATUS.callMeWhenLive(loadContent);
     }, [storeMode])
 
     return (
