@@ -12,23 +12,34 @@ import 'bootstrap/dist/css/bootstrap.css';
 const devDeployement = true;
 
 if (devDeployement) {
-  const username = prompt("Enter Username");
-  const password = prompt("Enter Password");
-
-  if ((password !== null || password !== '') && (username !== null || username !== '')) {
-    if (username === 'xnaskjfjlldlfka@$@#$' && password === 'fdhiahsd3294y3298Y(*&(*&kjlhf(*UP(U') {
-      GLOBAL_APP_STATUS.setApplicationReadyStatus(true);
-      ReactDOM.render(
-        <React.StrictMode>
-          <App />
-        </React.StrictMode>,
-        document.getElementById('root')
-      );
-    } else {
-      alert('Username or Password is invalid!')
-    }
+  console.log(localStorage.getItem('_u') === 'xnaskjfjlldlfka@$@#$', localStorage.getItem('_p') === 'fdhiahsd3294y3298Y(*&(*&kjlhf(*UP(U')
+  if (
+    localStorage.getItem('_u') === 'xnaskjfjlldlfka@$@#$' && 
+    localStorage.getItem('_p') === 'fdhiahsd3294y3298Y(*&(*&kjlhf(*UP(U'
+  ) {
+    GLOBAL_APP_STATUS.setApplicationReadyStatus(true);
+    ReactDOM.render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>,
+      document.getElementById('root')
+    );
   } else {
-    alert('Username or Password is empty.');
+    const username = prompt("Enter Username");
+    const password = prompt("Enter Password");
+
+    if ((password !== null || password !== '') && (username !== null || username !== '')) {
+      if (username === 'xnaskjfjlldlfka@$@#$' && password === 'fdhiahsd3294y3298Y(*&(*&kjlhf(*UP(U') {
+        localStorage.setItem('_u', 'xnaskjfjlldlfka@$@#$');
+        localStorage.setItem('_p', 'fdhiahsd3294y3298Y(*&(*&kjlhf(*UP(U');
+
+        window.location.reload();
+      } else {
+        alert('Username or Password is invalid!')
+      }
+    } else {
+      alert('Username or Password is empty.');
+    }
   }
 } else {
   GLOBAL_APP_STATUS.setApplicationReadyStatus(true);
