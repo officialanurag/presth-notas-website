@@ -1,0 +1,30 @@
+.page-title {
+    font-size: 20px !important;
+    padding-left: 25px !important;
+    letter-spacing: 0.5px !important;
+    font-weight: bold;
+    border-radius: 0px 0px 0px 0px;
+    padding-right: 2px;
+    margin-left: 5px;
+    cursor: pointer;
+    background: #051e3e;
+    color: white;
+}
+.page-title-close {
+    font-size: 20px !important;
+    background: #051e3e;
+}
+.close-page {
+    margin: 0px 7px 5px 10px;
+    padding: 1px;
+    cursor: pointer;
+}
+.page-title-input {
+    background: white;
+    border: 1px solid #051e3e;
+    color: #051e3e;
+    font-weight: bold;
+    height: 25px;
+    padding-bottom: 2px;
+    padding-left: 5px;
+}

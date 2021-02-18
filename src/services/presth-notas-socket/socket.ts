@@ -12,6 +12,7 @@ class PresthNotasSocket {
     private static instance: PresthNotasSocket;
 
     private connString: string = 'wss://pickiser.com:4000';
+    // private connString: string = 'ws://localhost:4000';
     private connection: WebSocket = {} as any;
     private status = {
         isConnected: false

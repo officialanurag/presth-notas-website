@@ -4,26 +4,40 @@ import './index.css';
 import App from './App';
 import { GLOBAL_APP_STATUS } from './global'
 
-// Importing Bootstrap
+// Importing Bootstrap & JQuery
+import 'jquery';
+import 'bootstrap/dist/js/bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 
-const username = prompt("Enter Username");
-const password = prompt("Enter Password");
+const devDeployement = true;
 
-if ((password !== null || password !== '') && (username !== null || username !== '')) {
-  if (username === 'xnaskjfjlldlfka@$@#$' && password === 'fdhiahsd3294y3298Y(*&(*&kjlhf(*UP(U') {
-    GLOBAL_APP_STATUS.setApplicationReadyStatus(true);
-    ReactDOM.render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>,
-      document.getElementById('root')
-    );
+if (devDeployement) {
+  const username = prompt("Enter Username");
+  const password = prompt("Enter Password");
+
+  if ((password !== null || password !== '') && (username !== null || username !== '')) {
+    if (username === 'xnaskjfjlldlfka@$@#$' && password === 'fdhiahsd3294y3298Y(*&(*&kjlhf(*UP(U') {
+      GLOBAL_APP_STATUS.setApplicationReadyStatus(true);
+      ReactDOM.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>,
+        document.getElementById('root')
+      );
+    } else {
+      alert('Username or Password is invalid!')
+    }
   } else {
-    alert('Username or Password is invalid!')
+    alert('Username or Password is empty.');
   }
 } else {
-  alert('Username or Password is empty.');
+  GLOBAL_APP_STATUS.setApplicationReadyStatus(true);
+  ReactDOM.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>,
+    document.getElementById('root')
+  );
 }
 
 // If you want to start measuring performance in your app, pass a function

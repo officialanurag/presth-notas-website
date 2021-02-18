@@ -24,13 +24,11 @@ class ApplicationStatus {
     private constructor() {}
 
     private notifySubscribers(status: boolean): void {
-        if (this.enableProject) {
-            if (status) {
-                Object.values(this.subscribedNetworkLiveUpdateRegister).forEach(_subscriber => _subscriber());
-            } else {
-                Object.values(this.subscribedNetworkNotLiveUpdateRegister).forEach(_subscriber => _subscriber());
-            }
-        }
+        if (status) {
+            Object.values(this.subscribedNetworkLiveUpdateRegister).forEach(_subscriber => _subscriber());
+        } else {
+            Object.values(this.subscribedNetworkNotLiveUpdateRegister).forEach(_subscriber => _subscriber());
+        } 
     }
 
     public setServerStatus(status: boolean): void {

@@ -1,16 +1,16 @@
 .presth-notas-contenteditable-parent {
     position: fixed;
     width: 100%;
-    top: 0;
+    top: 35px;
     bottom: 0;
     /* overflow-y: scroll; */
     cursor: text;
 }
 .presth-notas-contenteditable {
     background: white;
-    padding: 2% 2% 0% 1%;
+    padding: 0.5% 0.5% 0% 1%;
     text-align: justify;
-    overflow-y: scroll;
+    /* overflow-y: scroll; */
     height: 100%;
 }
 [contenteditable] {

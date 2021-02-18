@@ -18,7 +18,7 @@ class PresthNotasEvent {
 
     public emit(eventName: string, payload: any) {
         if (this.eventRegister[eventName]) {
-            this.eventRegister[eventName](payload);
+            this.eventRegister[eventName](eventName, payload);
         }
     }
 }

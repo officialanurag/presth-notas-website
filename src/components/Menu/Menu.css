@@ -1,0 +1,56 @@
+.presth-notas-menu {
+    width: 101%;
+    padding-bottom: 1px;
+    border-bottom: 1px solid #0c0c0d1a;
+}
+.create-page {
+    font-size: 15px !important;
+    color: #051e3e;
+    border: 0px;
+    margin: 4px 1px 3px 10px;
+    background: white;
+    cursor: pointer;
+}
+.create-page:hover {
+    font-size: 15px !important;
+    color: white;
+    border: 0px;
+    margin: 4px 1px 3px 10px;
+    background: #0c0c0d1a;
+    cursor: pointer;
+}
+.presth-notas-menu-btn {
+    margin-top: 3px;
+    cursor: pointer;
+}
+.presth-notas-menu-btn:hover {
+    margin-top: 3px;
+    cursor: pointer;
+    background-color: #0c0c0d1a;
+    color: white;
+    border-radius: 3px;
+}
+.page-title-container {
+    max-width: 95%;
+}
+.show-page-btn {
+    color: #e2ddfd !important;
+    padding: 4px !important;
+    margin: 4px 5px 1px 4px;
+    cursor: pointer;
+}
+.show-page-dropdown {
+    background: #851e3e;
+}
+.dropdown-item.notes-list {
+    white-space: normal;
+}
+.dropdown-menu {
+    width: 500px !important;
+    white-space: normal;
+}
+.page-active {
+    background: #851e3e !important;
+    color: white !important;
+    font-weight: bold !important;
+}

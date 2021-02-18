@@ -23,13 +23,14 @@ class ContentService {
         GLOBAL_APP_STATUS.callMeWhenLive(this.updateSocketInstance);
     }
 
-    public fetchContent(userId: string): void {
+    public fetchContent(userId: string, pageId: string): void {
         const payload = {
             channel: "content",
             payload: {
                 service: "fetch_content",
                 payload: {
-                    userId: userId
+                    userId: userId,
+                    pageId: pageId
                 }
             },
             userId: userId,
@@ -38,13 +39,14 @@ class ContentService {
         this.presthNotasSocket.send(JSON.stringify(payload));        
     }
 
-    public storeContent(userId: string, text: string) {
+    public storeContent(userId: string, pageId: string, text: string) {
         const payload = {
             channel: "content",
             payload: {
                 service: "write_content",
                 payload: {
                     userId: userId,
+                    pageId: pageId,
                     text: text
                 }
             },
