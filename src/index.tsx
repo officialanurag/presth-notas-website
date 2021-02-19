@@ -1,15 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
 import { GLOBAL_APP_STATUS } from './global'
+import App from './App';
 
 // Importing Bootstrap & JQuery
 import 'jquery';
 import 'bootstrap/dist/js/bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 
-const devDeployement = false;
+const devDeployement = true;
 
 if (devDeployement) {
   console.log(localStorage.getItem('_u') === 'xnaskjfjlldlfka@$@#$', localStorage.getItem('_p') === 'fdhiahsd3294y3298Y(*&(*&kjlhf(*UP(U')

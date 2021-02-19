@@ -117,13 +117,13 @@ function Menu() {
         }
     }
 
-    const getAllPages = (): void => {
-        PageNote.getPageList('user_123');
-    }
-
-    GLOBAL_APP_STATUS.callMeWhenLive(getAllPages);
-
     useEffect(() => {
+        const getAllPages = (): void => {
+            PageNote.getPageList('user_123');
+        }
+    
+        GLOBAL_APP_STATUS.callMeWhenLive(getAllPages);
+    
         PageNote.subscribe((data: any) => {
             if (data.service === 'add_page') {
                 setPageList((pageList: Page[]) => {

@@ -62,31 +62,19 @@ function Notepad() {
         storeMode = 'mongodb';
     }
 
-    const loadContent = (pageId: string): void => {
-        if (GLOBAL_APP_STATUS.getServerStatus().isDatosServerConnected && storeMode !== 'indexeddb') {
-            Content.fetchContent('user_123', pageId);
-        }
-    }
-
     /**
      * Global application network status registers
      */
     GLOBAL_APP_STATUS.callMeWhenNotLive(setIndexedDBStorage);
     GLOBAL_APP_STATUS.callMeWhenLive(setMongoDBStorage);
 
-    const listenToEvents = (eventName: string, payload: any) => {
-        // if (eventName === 'renderPageData') {
-        //     setCurrentPageId(payload);
-        //     loadContent(payload);
-        // }
-        // if (eventName === 'createNewNote') {
-        //     setCurrentPageId('');
-        //     setText('');
-        // }
-        // if (eventName === 'setPageId') {
-        //     setCurrentPageId(payload);
-        // }
+    const loadContent = (pageId: string): void => {
+        if (GLOBAL_APP_STATUS.getServerStatus().isDatosServerConnected && storeMode !== 'indexeddb') {
+            Content.fetchContent('user_123', pageId);
+        }
+    }
 
+    const listenToEvents = (eventName: string, payload: any) => {
         const eventsMethods: {[key: string]: Function} = {
             'renderPageData': () => {
                 setCurrentPageId(payload);
@@ -100,13 +88,13 @@ function Notepad() {
                 setCurrentPageId(payload);
             }
         }
-
         eventsMethods[eventName]();
     }
 
     PNEvent.register('renderPageData', listenToEvents);
     PNEvent.register('createNewNote', listenToEvents);
     PNEvent.register('setPageId', listenToEvents);
+
 
     useEffect(() => {
         const onResponse = (data: any) => {
@@ -120,7 +108,7 @@ function Notepad() {
         }
 
         Content.subscribe(onResponse);
-    }, [])
+    }, [storeMode])
 
     return (
         <div 

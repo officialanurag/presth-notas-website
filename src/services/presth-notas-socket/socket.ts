@@ -10,22 +10,22 @@ import { GLOBAL_APP_STATUS } from '../../global';
 
 class PresthNotasSocket {
     private static instance: PresthNotasSocket;
-
-    private connString: string = 'wss://pickiser.com:4000';
-    // private connString: string = 'ws://localhost:4000';
+    private devMode = 'prod'; // Other mode -> dev
+    private connString: string = this.devMode === 'prod' 
+        ? 'wss://pickiser.com:4000' 
+        : 'ws://localhost:4000';
     private connection: WebSocket = {} as any;
     private status = {
         isConnected: false
     };
     private subscribedComponents: {[key: string]: Function} = { };
 
-    private constructor() {
-        this.initProcess();
-    }
+    private constructor() {}
 
     public static getInstance(): PresthNotasSocket {
         if (!PresthNotasSocket.instance) {
             PresthNotasSocket.instance = new PresthNotasSocket();
+            PresthNotasSocket.instance.initProcess();
         }
 
         return PresthNotasSocket.instance;
