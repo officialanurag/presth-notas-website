@@ -9,7 +9,7 @@ import 'jquery';
 import 'bootstrap/dist/js/bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 
-const devDeployement = true;
+const devDeployement = false;
 
 if (devDeployement) {
   console.log(localStorage.getItem('_u') === 'xnaskjfjlldlfka@$@#$', localStorage.getItem('_p') === 'fdhiahsd3294y3298Y(*&(*&kjlhf(*UP(U')
