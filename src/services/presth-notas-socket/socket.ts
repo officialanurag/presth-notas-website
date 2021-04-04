@@ -10,7 +10,7 @@ import { GLOBAL_APP_STATUS } from '../../global';
 
 class PresthNotasSocket {
     private static instance: PresthNotasSocket;
-    private devMode = 'dev'; // Other mode -> prod
+    private devMode = 'prod'; // Other mode -> dev
     private connString: string = this.devMode === 'prod' 
         ? 'wss://pickiser.com:4000' 
         : 'ws://localhost:4000';
