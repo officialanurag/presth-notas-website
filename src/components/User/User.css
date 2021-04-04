@@ -1,0 +1,15 @@
+.pn-small {
+    font-size: 14px;
+    color: #00000078;
+}
+.invalid-value {
+    color: #ce0202;
+    font-size: 12px;
+}
+.success {
+    color: #11a611;
+}
+
+.mt-b {
+    margin-bottom: 5%;
+}

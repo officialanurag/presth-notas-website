@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import './Menu.css';
-import PageHeader from './MenuComponents/PageHeaderComponent';
 import { Page } from './IMenu';
 import { PageNote } from './../../services/page.services';
 import { GLOBAL_APP_STATUS } from '../../global';
 import { PNEvent } from '../../services/presth-notas-event/event';
 
+import PageHeader from './MenuComponents/PageHeaderComponent';
+import MenuModal from './MenuComponents/MenuModalComponent';
+import { PNLStorage } from '../../services/presth-notas-localstorage';
+import { Content } from '../../services/content.services';
+
 function Menu() {
-    const [intializing, setIntializing] = useState(false);
+    const userId: string = PNLStorage.get('_ui') || '';
     const [pageList, setPageList] = useState<Page[]>([{
         pageId: '0',
         pageType: 'untitled',
@@ -24,6 +28,10 @@ function Menu() {
         isEditing: false,
         isSaved: false
     });
+    const [disableFeature, setDisableFeature] = useState({
+        pageList: true,
+        addPage: true
+    });
 
     /**
      * Component's methods
@@ -36,7 +44,15 @@ function Menu() {
             return page;
         });
         setPageList(pages);
-        PageNote.addPage('user_123', pageId, value);
+
+        if (GLOBAL_APP_STATUS.isUserLoggedIn()) {
+            PageNote.addPage(userId, pageId, value);
+        } else {
+            let pnlPages: any = JSON.parse(PNLStorage.get('_pages') || '{}');
+            pnlPages['title'] = value;
+            pnlPages['active'] = true;
+            PNLStorage.set('_pages', JSON.stringify(pnlPages));
+        }
     }
 
     const addNewPage = (): void => {
@@ -77,8 +93,8 @@ function Menu() {
         setPageList(pages);
         setCurrentPage(pages[pages.length - 1]);
         PNEvent.emit('renderPageData', pages[pages.length - 1].pageId);
-        PageNote.removePage('user_123', pageId);
-        PageNote.setActivePage('user_123', pages[pages.length - 1].pageId);
+        PageNote.removePage(userId, pageId);
+        PageNote.setActivePage(userId, pages[pages.length - 1].pageId);
         
     }
 
@@ -96,7 +112,7 @@ function Menu() {
         PNEvent.emit('renderPageData', localCurrentPage.pageId);
 
         if (GLOBAL_APP_STATUS.getServerStatus().isDatosServerConnected) {
-            PageNote.setActivePage('user_123', pageId);
+            PageNote.setActivePage(userId, pageId);
         }
     }
 
@@ -119,7 +135,46 @@ function Menu() {
 
     useEffect(() => {
         const getAllPages = (): void => {
-            PageNote.getPageList('user_123');
+            if (GLOBAL_APP_STATUS.isUserLoggedIn()) {
+                PageNote.getPageList(userId);
+            } else {
+                setDisableFeature({
+                    pageList: false,
+                    addPage: false
+                });
+
+                const localPage: any = JSON.parse(PNLStorage.get('_pages') || 'null');
+                let page: Page = {
+                    pageId: '0',
+                    pageType: 'untitled',
+                    pageName: 'Untitled Note',
+                    active: true,
+                    isEditing: false,
+                    isSaved: false
+                };
+
+                if (localPage) {
+                    setCurrentPage({
+                        pageId: '0',
+                        pageType: 'untitled',
+                        pageName: localPage.title,
+                        active: localPage.active,
+                        isEditing: false,
+                        isSaved: false
+                    });
+                    page = {
+                        pageId: '0',
+                        pageType: 'untitled',
+                        pageName: localPage.title,
+                        active: localPage.active,
+                        isEditing: false,
+                        isSaved: false
+                    };
+                }
+
+                setPageList([page]);
+                PNEvent.emit('renderPageData', '0');
+            }
         }
     
         GLOBAL_APP_STATUS.callMeWhenLive(getAllPages);
@@ -134,6 +189,12 @@ function Menu() {
                             page.isSaved = true;
 
                             PNEvent.emit('setPageId', data.result.pageId);
+                            if (data.result.localPageId === 'LOCAL') {
+                                const localPage = (JSON.parse(PNLStorage.get('_pages') || 'null'))
+                                if (localPage) {
+                                    Content.storeContent(userId, page.pageId, localPage.text);
+                                }
+                            }
                         }
                         return page;
                     });
@@ -176,10 +237,28 @@ function Menu() {
                         isSaved: false
                     }];
                 }
+
+                // Setting localstorage data
+                const localPage = JSON.parse(PNLStorage.get('_pages') || 'null');
+                if (localPage && !localPage?.isSaved) {
+                    pages = pages[0].pageId === '0' ? [] : pages;
+                    pages.push({
+                        pageId: 'LOCAL',
+                        pageType: 'untitled',
+                        pageName: localPage.title,
+                        active: false,
+                        isEditing: false,
+                        isSaved: false
+                    });
+                    localPage['isSaved'] = true;
+                    PNLStorage.set('_pages', JSON.stringify(localPage));
+                    PageNote.addPage(userId, 'LOCAL', localPage.title);
+                }
                 setPageList(pages);
+        
             }
         });
-    }, [])
+    }, [userId, pageList])
 
     return (
         <div className="row presth-notas-menu">
@@ -197,61 +276,99 @@ function Menu() {
                             pin={false}
                             recordContent={recordContent} 
                             removePage={removePage}
-                            setEditing={setEditing}
+                            setEditing={setEditing} 
                         />)
                         : ''
                     }
                     
                     <div
-                        className="dropdown show-page-dropdown"
+                        className={`dropdown ${ disableFeature.pageList ? 'show-page-dropdown' : 'show-page-dropdown-disable'}`}
+                        title={`${disableFeature.pageList ? 'Access page list' : 'Page list disabled. Please login.'}`}
                     >
-                        <svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="20" 
-                            height="20" 
-                            fill="white" 
-                            className="bi bi-caret-down-fill show-page-btn" 
-                            viewBox="0 0 16 16"
-                            id="dropdownMenuButton" 
-                            data-toggle="dropdown" 
-                            aria-haspopup="true" 
-                            aria-expanded="false"
+                        {
+                            disableFeature.pageList 
+                            ? <>
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    width="20" 
+                                    height="20" 
+                                    fill="white" 
+                                    className="bi bi-caret-down-fill show-page-btn" 
+                                    viewBox="0 0 16 16"
+                                    id="dropdownMenuButton" 
+                                    data-toggle="dropdown" 
+                                    aria-haspopup="true" 
+                                    aria-expanded="false"
+                                >
+                                    <path 
+                                        d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" 
+                                    />
+                                </svg>
+                                <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    {
+                                        pageList.map((page: Page) => (
+                                            <span
+                                                key={page.pageId}
+                                                className={`dropdown-item notes-list ${page.active ? 'page-active' : ''}`}
+                                                onClick={() => setActive(page.pageId)}
+                                            >
+                                                {page.pageName}
+                                            </span>
+                                        ))
+                                    }
+                                </div>
+                            </>
+                            : <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                width="20" 
+                                height="20" 
+                                fill="white" 
+                                className="bi bi-caret-down-fill show-page-btn" 
+                                viewBox="0 0 16 16"
+                            >
+                                <path 
+                                    d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" 
+                                />
+                            </svg>
+                        }
+                        
+                    </div>
+                    {
+                        disableFeature.addPage
+                        ? <div
+                            onClick={addNewPage}
                         >
-                            <path 
-                                d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" 
-                            />
-                        </svg>
-                        <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            {
-                                pageList.map((page: Page) => (
-                                    <span
-                                        key={page.pageId}
-                                        className={`dropdown-item notes-list ${page.active ? 'page-active' : ''}`}
-                                        onClick={() => setActive(page.pageId)}
-                                    >
-                                        {page.pageName}
-                                    </span>
-                                ))
-                            }
+                            <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                width="20" 
+                                height="20" 
+                                fill="currentColor" 
+                                className="bi bi-plus create-page" 
+                                viewBox="0 0 16 16"
+                            >
+                                <path 
+                                    d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" 
+                                />
+                            </svg>
                         </div>
-                    </div>
-                    <div
-                        onClick={addNewPage}
-                    >
-                        {/* <button type="button" className="create-page">+</button> */}
-                        <svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="20" 
-                            height="20" 
-                            fill="currentColor" 
-                            className="bi bi-plus create-page" 
-                            viewBox="0 0 16 16"
+                        : <div
+                            title="You cannot add new page. Please login."
                         >
-                            <path 
-                                d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" 
-                            />
-                        </svg>
-                    </div>
+                            <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                width="20" 
+                                height="20" 
+                                fill="#c9c8c8" 
+                                className="bi bi-plus create-page-disable" 
+                                viewBox="0 0 16 16"
+                            >
+                                <path 
+                                    d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" 
+                                />
+                            </svg>
+                        </div>
+                    }
+                    
                 </div>
             </div>
             <div className="col-md-1 text-right">
@@ -262,6 +379,8 @@ function Menu() {
                     fill="currentColor" 
                     className="bi bi-list presth-notas-menu-btn" 
                     viewBox="0 0 16 16"
+                    data-toggle="modal" 
+                    data-target="#exampleModal"
                 >
                     <path 
                         fillRule="evenodd" 
@@ -269,6 +388,9 @@ function Menu() {
                     />
                 </svg>
             </div>
+
+            {/* Menu Modal */}
+            <MenuModal />
         </div>
     );
 }

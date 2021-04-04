@@ -11,6 +11,14 @@
     background: white;
     cursor: pointer;
 }
+.create-page-disable {
+    font-size: 15px !important;
+    color: #051e3e;
+    border: 0px;
+    margin: 4px 1px 3px 10px;
+    background: white;
+    cursor: pointer;
+}
 .create-page:hover {
     font-size: 15px !important;
     color: white;
@@ -53,4 +61,7 @@
     background: #851e3e !important;
     color: white !important;
     font-weight: bold !important;
+}
+.show-page-dropdown-disable {
+    background: #c9c8c8;
 }

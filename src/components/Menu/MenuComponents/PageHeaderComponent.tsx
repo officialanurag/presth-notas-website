@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './PageHeader.css';
 
 function PageHeader(props: {
@@ -12,10 +12,9 @@ function PageHeader(props: {
     removePage: any,
     setEditing: any
 }) {
-    const [pageName, setPageName] = useState(props.pageName);
 
     const recordContent = (e: any): void => {
-        setPageName(e.target.value);
+        props.recordContent(props.pageId, e.target.value ?? 'Untitled Note', props.isSaved);
     }
 
     const removePage = (): void => {
@@ -29,7 +28,6 @@ function PageHeader(props: {
     const handleEnter = (e: any): void => {
         if (e.code === 'Enter' || e.keyCode === 13) {
             props.setEditing(props.pageId, false, props.active);
-            props.recordContent(props.pageId, pageName ?? 'Untitled Note', props.isSaved);
         }
     }
 
@@ -38,6 +36,7 @@ function PageHeader(props: {
             <div
                 className={`page-title`}
                 onDoubleClick={activeEditing}
+                title="Doblue click to edit page name."
             >
                 {
                     props.isEditing 
@@ -50,9 +49,9 @@ function PageHeader(props: {
                     />)
                     : <span>
                         {
-                            pageName.length > 80
-                            ? `${pageName.slice(0, 80)} . . .`
-                            : pageName
+                            props.pageName.length > 80
+                            ? `${props.pageName.slice(0, 80)} . . .`
+                            : props.pageName
                         }
                     </span>
                 }
@@ -60,6 +59,7 @@ function PageHeader(props: {
             <div
                 className={`page-title-close`}
                 onClick={removePage}
+                title="Remove page."
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

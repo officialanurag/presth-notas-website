@@ -1,3 +1,4 @@
+import { PNLStorage } from "../services/presth-notas-localstorage";
 import { GlobalStatus } from "./IGlobalApp";
 
 class ApplicationStatus {
@@ -37,6 +38,15 @@ class ApplicationStatus {
             this.updateNetworkStatusBar(status)
             this.notifySubscribers(status);
         }
+    }
+
+    public isUserLoggedIn(): boolean {
+        let isUserLoggedIn = false;
+        if (PNLStorage.get('_ui') && PNLStorage.get('_un')) {
+            isUserLoggedIn = true;
+        }
+
+        return isUserLoggedIn;
     }
 
     public getServerStatus(): GlobalStatus {

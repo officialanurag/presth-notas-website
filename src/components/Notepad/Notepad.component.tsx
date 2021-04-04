@@ -4,8 +4,10 @@ import { Content } from './../../services/content.services';
 import { GLOBAL_APP_STATUS } from './../../global';
 import { PNIndexedDB } from './../../services/presth-notas-indexdb/indexdb'; 
 import { PNEvent } from '../../services/presth-notas-event/event';
+import { PNLStorage } from '../../services/presth-notas-localstorage';
 
 function Notepad() {
+    const userId: string = PNLStorage.get('_ui') || '';
     /**
      * Local states and instances
      */
@@ -24,12 +26,18 @@ function Notepad() {
      * Component's methods
      */
     const recordContent = (e: any): void => {
-        if (storeMode === 'mongodb' && currentPageId !== '') {
-            Content.storeContent('user_123', currentPageId, e.target.innerHTML);
+        if (storeMode === 'mongodb' && currentPageId !== '' && GLOBAL_APP_STATUS.isUserLoggedIn()) {
+            Content.storeContent(userId, currentPageId, e.target.innerHTML);
         }
 
-        if (storeMode === 'indexeddb') {
+        if (storeMode === 'indexeddb' && GLOBAL_APP_STATUS.isUserLoggedIn()) {
             pnIndexedDB.writeContent(e.target.innerHTML);
+        }
+
+        if (!GLOBAL_APP_STATUS.isUserLoggedIn()) {
+            const localPage: any = JSON.parse(PNLStorage.get('_pages') || '{}');
+            localPage['text'] = e.target.innerHTML;
+            PNLStorage.set('_pages', JSON.stringify(localPage));
         }
     }
 
@@ -44,8 +52,8 @@ function Notepad() {
     }
 
     const updateDataFromIndexedDB = (content: string): void => {
-        if (!content.includes('~EMPTY~') && currentPageId !== '') {
-            Content.storeContent('user_123', currentPageId, content);
+        if (!content.includes('~EMPTY~') && currentPageId !== '' && GLOBAL_APP_STATUS.isUserLoggedIn()) {
+            Content.storeContent(userId, currentPageId, content);
         }
     }
 
@@ -69,16 +77,29 @@ function Notepad() {
     GLOBAL_APP_STATUS.callMeWhenLive(setMongoDBStorage);
 
     const loadContent = (pageId: string): void => {
-        if (GLOBAL_APP_STATUS.getServerStatus().isDatosServerConnected && storeMode !== 'indexeddb') {
-            Content.fetchContent('user_123', pageId);
+        setSpellChecker(true);
+        if (GLOBAL_APP_STATUS.isUserLoggedIn()) {
+            if (
+                GLOBAL_APP_STATUS.getServerStatus().isDatosServerConnected && 
+                storeMode !== 'indexeddb'
+            ) {
+                Content.fetchContent(userId, pageId);
+            }
         }
     }
 
     const listenToEvents = (eventName: string, payload: any) => {
         const eventsMethods: {[key: string]: Function} = {
             'renderPageData': () => {
-                setCurrentPageId(payload);
-                loadContent(payload);
+                if (GLOBAL_APP_STATUS.isUserLoggedIn()) {
+                    setCurrentPageId(payload);
+                    loadContent(payload);
+                } else {
+                    const localPage: any = JSON.parse(PNLStorage.get('_pages') || '{}');
+                    if (localPage && localPage.text) {
+                        setText(localPage.text);
+                    }
+                }
             },
             'createNewNote': () => {
                 setCurrentPageId('');
